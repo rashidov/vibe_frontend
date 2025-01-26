@@ -1,6 +1,5 @@
 // let mediaStream: MediaStream | null = null
-import {useRef, useState} from "react";
-import {socket} from "@/app/socket";
+import { useRef, useState } from 'react'
 
 let mediaRecorder: MediaRecorder | null = null
 let mediaChunks: Blob[] = []
@@ -9,7 +8,7 @@ const isRecordingStarted = () => !!mediaRecorder
 
 const startRecording = async () => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true})
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     // https://www.w3.org/TR/mediastream-recording/#mediarecorder-constructor
     // создаем экземпляр рекордера
     // mediaRecorder = new MediaRecorder(stream, { mimeType: `audio/webm` })
@@ -31,7 +30,7 @@ const startRecording = async () => {
   }
 }
 const stopRecording = () => {
-  if (!mediaRecorder)  return
+  if (!mediaRecorder) return
 
   // останавливаем рекордер
   mediaRecorder!.stop()
@@ -43,11 +42,11 @@ const stopRecording = () => {
   // https://w3c.github.io/FileAPI/#file-constructor
   // создаем новый файл
   const file = new File(mediaChunks, 'my_record.webm', {
-    type: `audio/webm`
+    type: `audio/webm`,
   })
 
   const blob = new Blob(mediaChunks, { type: 'audio/raw' })
-  socket.emit('audio-data', blob)
+  // socket.emit('audio-data', blob)
 
   // без этого запись можно будет создать только один раз
   mediaRecorder!.ondataavailable = null
@@ -82,7 +81,9 @@ export default function Recording() {
       <button
         type={'button'}
         onClick={!recording ? start : stop}
-        className={"text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"}
+        className={
+          'text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'
+        }
       >
         {!recording ? 'record' : 'recording... stop record'}
       </button>

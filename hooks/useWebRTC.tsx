@@ -1,16 +1,16 @@
-import {useCallback, useEffect, useRef, useState} from "react";
-import {useStateWithCb, UseStateWithCbCallback} from "@/hooks/useStateWithCb";
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useStateWithCb, UseStateWithCbCallback } from '@/hooks/useStateWithCb'
 // import {socket} from "@/app/socket";
-import {ACTIONS} from "@/lib/constants";
+import { ACTIONS } from '@/lib/constants'
 // @ts-ignore
-import freeice  from 'freeice'
-import {socket} from "@/hooks/useSocket";
+import freeice from 'freeice'
+import { socket } from '@/hooks/useSocket'
 
 export const LOCAL = 'LOCAL'
 
-type PeerConnection = Record<string,  RTCPeerConnection>
+type PeerConnection = Record<string, RTCPeerConnection>
 type SessionDescriptionSocketPayload = {
-  peerId: string,
+  peerId: string
   sessionDescription: RTCSessionDescriptionInit
 }
 type IceCandidateSocketPayload = {
@@ -22,7 +22,9 @@ type RemovePeerSocketPayload = {
 }
 
 export const useWebRTC = (roomId: string) => {
-  const { state: clients, updateState: updateClients } = useStateWithCb<string[]>([])
+  const { state: clients, updateState: updateClients } = useStateWithCb<
+    string[]
+  >([])
 
   // all peer connections
   const peerConnectionsRef = useRef<PeerConnection>({})
@@ -33,10 +35,13 @@ export const useWebRTC = (roomId: string) => {
     [LOCAL]: null,
   })
 
-  const addNewClient = useCallback((newClient: string, cb: UseStateWithCbCallback<string[]>) => {
-    if (!clients.includes(newClient)) return
-    updateClients((prev) => [...prev, newClient], cb)
-  }, [clients, updateClients])
+  const addNewClient = useCallback(
+    (newClient: string, cb: UseStateWithCbCallback<string[]>) => {
+      if (!clients.includes(newClient)) return
+      updateClients((prev) => [...prev, newClient], cb)
+    },
+    [clients, updateClients],
+  )
 
   const startCapture = async () => {
     localMediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
@@ -52,11 +57,20 @@ export const useWebRTC = (roomId: string) => {
     })
   }
 
-  const provideMediaRef = useCallback((id: string, node: HTMLAudioElement | null ) => {
-    peerMediaElements.current[id] = node
-  }, [])
+  const provideMediaRef = useCallback(
+    (id: string, node: HTMLAudioElement | null) => {
+      peerMediaElements.current[id] = node
+    },
+    [],
+  )
 
-  const addNewPeer = async ({ peerId, createOffer  }: {peerId: string, createOffer: boolean}) => {
+  const addNewPeer = async ({
+    peerId,
+    createOffer,
+  }: {
+    peerId: string
+    createOffer: boolean
+  }) => {
     if (peerConnectionsRef.current?.[peerId]) {
       return console.warn('Already connected to peer', peerId)
     }
@@ -64,12 +78,11 @@ export const useWebRTC = (roomId: string) => {
     // @ts-ignore
     // peerConnectionsRef.current[peerId] = null
 
-
     /**
      * Создаем RTCPeerConnection
      */
     peerConnectionsRef.current![peerId] = new RTCPeerConnection({
-      iceServers: freeice()
+      iceServers: freeice(),
     })
 
     console.log('add new peer', peerConnectionsRef.current)
@@ -77,17 +90,20 @@ export const useWebRTC = (roomId: string) => {
     /**
      * Обработчик на вызов setLocalDescription
      */
-    peerConnectionsRef.current![peerId].onicecandidate = ({candidate}) => {
-      if (candidate) socket.emit(ACTIONS.ROOM_RELAY_ICE, { peerId, iceCandidate: candidate })
+    peerConnectionsRef.current![peerId].onicecandidate = ({ candidate }) => {
+      if (candidate)
+        socket.emit(ACTIONS.ROOM_RELAY_ICE, { peerId, iceCandidate: candidate })
     }
     let tracksNum = 0
 
     /**
      * Добавляем клиента и транслируем медиа
      */
-    peerConnectionsRef.current![peerId].ontrack = ({ streams: [remoteStream] }) => {
+    peerConnectionsRef.current![peerId].ontrack = ({
+      streams: [remoteStream],
+    }) => {
       // ...it`s audio stream
-      tracksNum++;
+      tracksNum++
       // ...here should check two streams [audio, video]
       addNewClient(peerId, () => {
         peerMediaElements.current![peerId]!.srcObject = remoteStream
@@ -98,13 +114,16 @@ export const useWebRTC = (roomId: string) => {
      * Добавляем треки из localMediaStream к peerConnections
      */
     localMediaStreamRef.current?.getTracks().forEach((track) => {
-      peerConnectionsRef.current![peerId].addTrack(track, localMediaStreamRef.current!)
+      peerConnectionsRef.current![peerId].addTrack(
+        track,
+        localMediaStreamRef.current!,
+      )
     })
 
     /**
      * Если есть createOffer, тогда создаем offer и прикрепляется к peer соединению
      */
-    if(createOffer) {
+    if (createOffer) {
       const offer = await peerConnectionsRef.current![peerId].createOffer()
       await peerConnectionsRef.current![peerId].setLocalDescription(offer)
 
@@ -115,12 +134,15 @@ export const useWebRTC = (roomId: string) => {
     }
   }
 
-  const setRemoteMedia = async ({ peerId, sessionDescription }: SessionDescriptionSocketPayload) => {
+  const setRemoteMedia = async ({
+    peerId,
+    sessionDescription,
+  }: SessionDescriptionSocketPayload) => {
     /**
      * Прикрепляем SPD данные
      */
     await peerConnectionsRef.current![peerId]?.setRemoteDescription(
-      new RTCSessionDescription(sessionDescription)
+      new RTCSessionDescription(sessionDescription),
     )
 
     /**
@@ -138,9 +160,12 @@ export const useWebRTC = (roomId: string) => {
     }
   }
 
-  const iceCandidate = async ({ peerId, iceCandidate }: IceCandidateSocketPayload) => {
+  const iceCandidate = async ({
+    peerId,
+    iceCandidate,
+  }: IceCandidateSocketPayload) => {
     await peerConnectionsRef.current![peerId].addIceCandidate(
-      new RTCIceCandidate(iceCandidate)
+      new RTCIceCandidate(iceCandidate),
     )
   }
 
@@ -186,7 +211,9 @@ export const useWebRTC = (roomId: string) => {
 
     return () => {
       if (localMediaStreamRef.current?.getTracks()) {
-        localMediaStreamRef.current?.getTracks().forEach((track) => track.stop())
+        localMediaStreamRef.current
+          ?.getTracks()
+          .forEach((track) => track.stop())
         socket.emit(ACTIONS.ROOM_LEAVE)
       }
     }

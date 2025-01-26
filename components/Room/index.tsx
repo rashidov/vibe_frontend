@@ -1,8 +1,8 @@
 'use client'
 
-import {FC} from "react";
-import {LOCAL, useWebRTC} from "@/hooks/useWebRTC";
-import {Button} from "@/components/ui/button";
+import { FC } from 'react'
+import { LOCAL, useWebRTC } from '@/hooks/useWebRTC'
+import { Button } from '@/components/ui/button'
 
 type Props = {
   roomId: string
@@ -10,7 +10,7 @@ type Props = {
 }
 
 const Room: FC<Props> = ({ roomId, onDisconnect }) => {
-  const {clients, provideMediaRef} = useWebRTC(roomId)
+  const { clients, provideMediaRef } = useWebRTC(roomId)
 
   return (
     <div className="d-flex flex-col gap-3">
@@ -19,10 +19,15 @@ const Room: FC<Props> = ({ roomId, onDisconnect }) => {
         {clients.map((client) => (
           <div key={client} className="d-flex gap-1">
             <p>client: {client}</p>
-            <audio muted={client === LOCAL} ref={(instance) => provideMediaRef(client, instance)} />
+            <audio
+              muted={client === LOCAL}
+              ref={(instance) => provideMediaRef(client, instance)}
+            />
           </div>
         ))}
-        <Button size="sm" onClick={onDisconnect}>disconnect</Button>
+        <Button size="sm" onClick={onDisconnect}>
+          disconnect
+        </Button>
       </div>
     </div>
   )
