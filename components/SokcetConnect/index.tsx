@@ -1,15 +1,16 @@
 'use client'
-import {AudioHTMLAttributes, useEffect, useRef, useState} from "react";
-import {useSocket} from "@/hooks/useSocket";
-import Recording from "@/components/Recording";
-import {Button} from "@/components/ui/button";
-import Room from "@/components/Room";
+import { AudioHTMLAttributes, useEffect, useRef, useState } from 'react'
+import { useSocket } from '@/hooks/useSocket'
+import Recording from '@/components/Recording'
+import { Button } from '@/components/ui/button'
+import Room from '@/components/Room'
 
 export default function SocketConnect() {
   // const [isConnected, setIsConnected] = useState(false)
   // const [transport, setTransport] = useState("N/A")
 
-  const { socket, isConnected, connect, disconnect, transport, rooms } = useSocket()
+  const { socket, isConnected, connect, disconnect, transport, rooms } =
+    useSocket()
   const [activeRoomId, setActiveRoomId] = useState<null | string>(null)
 
   // const mediaStream = useRef<MediaStream | null>(null)
@@ -47,18 +48,22 @@ export default function SocketConnect() {
     // })
   }, [])
 
-
   return (
     <>
       <p>socket id: {socket?.id || '-'}</p>
-      <p>status: { isConnected
-        ? <span className="text-green-700">connected</span>
-        : <span className="text-red-700">disconnected</span> }
+      <p>
+        status:{' '}
+        {isConnected ? (
+          <span className="text-green-700">connected</span>
+        ) : (
+          <span className="text-red-700">disconnected</span>
+        )}
       </p>
-      <p>transport: { transport }</p>
+      <p>transport: {transport}</p>
       <Button
         variant={!isConnected ? 'secondary' : 'destructive'}
-        onClick={!isConnected ? connect : disconnect}>
+        onClick={!isConnected ? connect : disconnect}
+      >
         {!isConnected ? 'connect' : 'disconnect'}
       </Button>
       {/*<button*/}
@@ -71,15 +76,24 @@ export default function SocketConnect() {
 
       {/*<Recording />*/}
       <div className="d-flex flex-col gap-2">
-        {!activeRoomId && rooms.map((room) => (
-          <div key={room} className="d-flex flex-col gap-1">
-            <p>{room}</p>
-            <Button size="sm" onClick={() => setActiveRoomId(room)}>connect</Button>
-          </div>)
-        )}
+        {!activeRoomId &&
+          rooms.map((room) => (
+            <div key={room} className="d-flex flex-col gap-1">
+              <p>{room}</p>
+              <Button size="sm" onClick={() => setActiveRoomId(room)}>
+                connect
+              </Button>
+            </div>
+          ))}
       </div>
 
-      {!!activeRoomId && <Room key={activeRoomId} roomId={activeRoomId} onDisconnect={() => setActiveRoomId(null)} />}
+      {!!activeRoomId && (
+        <Room
+          key={activeRoomId}
+          roomId={activeRoomId}
+          onDisconnect={() => setActiveRoomId(null)}
+        />
+      )}
     </>
   )
 }
