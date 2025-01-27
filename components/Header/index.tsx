@@ -5,7 +5,7 @@ export default function Header() {
         <p className="font-mono text-2xl">Vibe</p>
         {/*<Account />*/}
       </div>
-      <div className="my-2 w-full h-px bg-zinc-800" />
+      <div className="my-5 w-full h-px bg-zinc-800" />
     </div>
   )
 }
