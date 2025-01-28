@@ -1,10 +1,17 @@
-import SocketConnect from '@/components/SokcetConnect'
+import { LoginForm } from '@/components/Login/LoginForm'
+import { UsedAccounts } from '@/components/Login/UsedAccounts'
+import Header from '@/components/Header'
 
 export default function Home() {
-  console.log('render')
   return (
-    <div className="pl-3 pr-3 pt-5 font-[family-name:var(--font-geist-sans)]">
-      <SocketConnect />
+    <div className="">
+      <Header />
+      <div className="w-full mt-40 flex justify-center">
+        <div className="w-96 flex flex-col gap-8">
+          <LoginForm />
+          <UsedAccounts />
+        </div>
+      </div>
     </div>
   )
 }
