@@ -6,12 +6,12 @@ type Props = {
 }
 
 const MainLayout: FC<Props> = ({ children }) => (
-  <div className="flex flex-col h-full max-h-full">
+  <section className="flex flex-col h-full max-h-full">
     <Header />
     <div className="flex h-full max-h-full overflow-hidden mb-5">
       {children}
     </div>
-  </div>
+  </section>
 )
 
 export default MainLayout
